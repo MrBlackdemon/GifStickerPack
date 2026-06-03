@@ -1,0 +1,2 @@
+rootProject.name = "GifStickerPack"
+include ':app'
