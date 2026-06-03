@@ -1,0 +1,41 @@
+name: Build APK
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:   # permette di avviarlo manualmente dal sito
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout codice
+        uses: actions/checkout@v4
+
+      - name: Configura Java 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+
+      - name: Dai permessi a gradlew
+        run: chmod +x ./gradlew
+
+      - name: Compila APK debug
+        run: ./gradlew assembleDebug --stacktrace
+
+      - name: 📦 Carica APK come artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: GifStickerPack-debug
+          path: app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 7
